@@ -21,7 +21,7 @@ public class MapGeneratorStarter extends Application{
 
 		primaryStage.titleProperty().setValue("Map Generator");
 		primaryStage.setScene(scene);
-//		primaryStage.setFullScreen(true);
+		if(SCALE == 1) primaryStage.setFullScreen(true);
 		primaryStage.setHeight(HEIGHT);
 		primaryStage.setWidth(WIDTH);
 

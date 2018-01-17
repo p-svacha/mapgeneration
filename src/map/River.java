@@ -25,12 +25,14 @@ public class River extends MapElement{
 	public int x;
 	public int y;
 	
-	public double trendAngle;
+	public double initialAngle;
 	public double currentAngle;
 	
-	public int depth; // how many times did roads split up to now
+	public int category; //0 = biggest and so on 
+	public int splits; // how many times did roads split up to now
 	
 	public boolean active;
+	public boolean hasSplitted;
 	public boolean wentInactiveThisLoop; //used when two roads intersect that only one stops working
 
   /***************************************************************************
@@ -39,12 +41,13 @@ public class River extends MapElement{
    *                                                                         *
    **************************************************************************/
 	
-	public River(int x, int y, double trendAngle, int depth) {
+	public River(int x, int y, double initialAngle, double currentAngle, int category, int splits) {
 		this.x = x;
 		this.y = y;
-		this.trendAngle = trendAngle;
-		this.currentAngle = trendAngle;
-		this.depth = depth;
+		this.initialAngle = initialAngle;
+		this.currentAngle = currentAngle;
+		this.category = category;
+		this.splits = splits;
 		startPoint = new MoveTo(x, y);
 		active = true;
 	}

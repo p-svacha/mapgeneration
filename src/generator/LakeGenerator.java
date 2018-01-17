@@ -1,9 +1,6 @@
 package generator;
 
-import geometry.Circle;
-import geometry.CircleCircleIntersection;
 import geometry.Point;
-import geometry.Vector2;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -14,7 +11,7 @@ import map.City;
 import map.Lake;
 import map.Road;
 
-public class LakesGenerator {
+public class LakeGenerator {
 	
   /***************************************************************************
    *                                                                         *
@@ -22,7 +19,7 @@ public class LakesGenerator {
    *                                                                         *
    **************************************************************************/
 	
-	private final int LAKE_AMOUNT = 5;
+	private final int LAKE_AMOUNT = 2;
 	
 	private final Color LAKE_COLOR = new Color(112/255f, 199/255f, 244/255f, 1);
 	private final Color LAKE_STROKE_COLOR = new Color(50/255f, 119/255f, 167/255f, 1);
@@ -38,7 +35,7 @@ public class LakesGenerator {
    *                                                                         *
    **************************************************************************/
 	
-	public LakesGenerator() {
+	public LakeGenerator() {
 		r = new Random();
 	}
 
@@ -57,11 +54,11 @@ public class LakesGenerator {
 	private Point[] generateLakeArea(Lake lake) {
 		ArrayList<Point> area = new ArrayList<Point>();
 		
-		int nPoints = 18;
+		int nPoints = 8;
 		int size = 20;
 		int randomRangeDistance = 5;
 		int randomRangeXY = 3;
-		int trendSpeed = 11;
+		int trendSpeed = 9;
 		
 		for(int i = 0; i < nPoints; i++) {
 			double angle = (double)i/nPoints*360;
@@ -138,11 +135,9 @@ public class LakesGenerator {
 	}
 	
 	private boolean validPosition(int x, int y, int size, int mapWidth, int mapHeight, ArrayList<City> cities, ArrayList<Road> roads) {
-		Circle lakeCircle  = new Circle(new Vector2(x, y), size);
 		for(City c : cities) {
-			Circle cityCircle = new Circle(new Vector2(c.xPos, c.xPos), c.size);
-			CircleCircleIntersection intersection = new CircleCircleIntersection(lakeCircle, cityCircle);
-			if(intersection.type != CircleCircleIntersection.Type.SEPARATE) {
+			int distance = Generator.getDistanceBetweenTwoPoints(x, y, c.xPos, c.yPos);
+			if(distance < size + c.size) {
 				System.out.println("");
 				System.out.println("A city was the problem");
 				System.out.println("Lake X: " + x + " Y: " + y + " SIZE: " + size);
@@ -156,7 +151,10 @@ public class LakesGenerator {
 			for(LineTo line : r.path) {
 				Point p1 = new Point(currentX, currentY);
 				Point p2 = new Point((int) (line.getX()), (int) (line.getY()));
-				if(Generator.getCircleLineIntersection(p1, p2, new Point(x,y), size)) {
+				int distanceP1 = Generator.getDistanceBetweenTwoPoints(x, y, p1.x, p1.y);
+				int distanceP2 = Generator.getDistanceBetweenTwoPoints(x, y, p2.x, p2.y);
+				int distance = distanceP1 <= distanceP2 ? distanceP1 : distanceP2;
+				if(distance < size + r.width) {
 					System.out.println("");
 					System.out.println("A road was the problem");
 					System.out.println("Lake X: " + x + " Y: " + y + " SIZE: " + size);
@@ -165,6 +163,13 @@ public class LakesGenerator {
 				}
 				currentX = (int) line.getX();
 				currentY = (int) line.getY();
+			}
+		}
+		for(Lake l : lakes) {
+			int distance = Generator.getDistanceBetweenTwoPoints(x, y, l.xPos, l.yPos);
+			if(distance < size + l.size) {
+				System.out.println("A lake was the problem");
+				return false;
 			}
 		}
 		return true;

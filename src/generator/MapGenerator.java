@@ -31,7 +31,8 @@ public class MapGenerator {
 	
 	private CityGenerator cityGenerator;
 	private RoadGenerator roadGenerator;
-	private LakesGenerator lakesGenerator;
+	private LakeGenerator lakeGenerator;
+	private RiverGenerator riverGenerator;
 	
   /***************************************************************************
    *                                                                         *
@@ -42,7 +43,8 @@ public class MapGenerator {
 	public MapGenerator() {
 		cityGenerator = new CityGenerator();
 		roadGenerator = new RoadGenerator();
-		lakesGenerator = new LakesGenerator();
+		lakeGenerator = new LakeGenerator();
+		riverGenerator = new RiverGenerator();
 	}
 
   /***************************************************************************
@@ -58,6 +60,7 @@ public class MapGenerator {
 		cities.clear();
 		roads.clear();
 		lakes.clear();
+		rivers.clear();
 		
 		map.setBackgroundColor(new Color(234/255f, 242/255f, 229/255f, 1));
 		
@@ -80,16 +83,17 @@ public class MapGenerator {
 		}
 		
 		roads.addAll(roadGenerator.generate(width, height, cities));
-		lakes.addAll(lakesGenerator.generateLakes(width, height, cities, roads));
-		
-		
+		lakes.addAll(lakeGenerator.generateLakes(width, height, cities, roads));
+		rivers.addAll(riverGenerator.generateRivers(width, height, lakes));
 
 		
 		ArrayList<MapElement> allElements = new ArrayList<MapElement>();
+		
 		allElements.addAll(cities);
+		allElements.addAll(rivers);
 		allElements.addAll(roads);
 		allElements.addAll(lakes);
-		allElements.addAll(rivers);
+		
 		map.setMapElements(allElements);
 		
 		map.setWidth(widthProperty.getValue());

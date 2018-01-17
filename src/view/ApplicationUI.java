@@ -43,6 +43,7 @@ public class ApplicationUI extends StackPane {
 	  generator = new MapGenerator();
 	  mapView = new MapViewUI();
 	  toolbar = new ToolbarUI(generator, mapView);
+	  mapView.setToolbar(toolbar);
   }
   
   private void layoutViews() {

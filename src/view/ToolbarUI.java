@@ -34,6 +34,8 @@ public class ToolbarUI extends GridPane {
 	private Button generateButton;
 	
 	private final NumberStringConverter integerConverter = new NumberStringConverter();
+	
+	private Label coordinateLabel;
 
 
   /***************************************************************************
@@ -75,6 +77,8 @@ public class ToolbarUI extends GridPane {
 		  Map map = generator.generate();
 		  mapView.setMap(map);
 	  });
+	  
+	  coordinateLabel = new Label("X/X");
   }
   
   private void layoutControls() {
@@ -84,18 +88,33 @@ public class ToolbarUI extends GridPane {
 	  col2.setPercentWidth(50);
 	  getColumnConstraints().addAll(col1, col2);
 	  
-	  add(widthLabel, 0, 0);
-	  add(heightLabel, 0, 1);
+	  int row = 0;
+	  int col = 0;
 	  
-	  add(widthTextField, 1, 0);
-	  add(heightTextField, 1, 1);
-	  
-	  add(generateButton, 0, 2, 2, 1);
+	  add(widthLabel, col++, row);
+	  add(widthTextField, col++, row);
+	  row++;col=0;
+	  add(heightLabel, col++, row);
+	  add(heightTextField, col++, row);
+	  row++;col=0;
+	  add(generateButton, col++, row, 2, 1);
+	  row++;col=0;
+	  add(coordinateLabel, col++, row, 2, 1);
   }
   
   private void setupBindings() {
 	  widthTextField.textProperty().bindBidirectional(generator.widthProperty, integerConverter);
 	  heightTextField.textProperty().bindBidirectional(generator.heightProperty, integerConverter);
+  }
+  
+  /***************************************************************************
+   *                                                                         *
+   * Getters & Setters                                                       *
+   *                                                                         *
+   **************************************************************************/
+  
+  public void setCoordinates(int x, int y) {
+	  coordinateLabel.textProperty().setValue(x + "/" + y);
   }
 }
 

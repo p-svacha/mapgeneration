@@ -23,7 +23,7 @@ public class RoadGenerator {
 	private final double ROAD_MAX_CURVE_ANGLE = 10; //how much can road angle change every segmen
 	private final double ROAD_SPLIT_ANGLE_RANGE = 90; //i.e. 90 means it splits from 45° to 135°
 	private final int INITIAL_ADDITIONAL_ROADS = 0; //how many roads are initially added besides city roads
-	private final double ROAD_SPLIT_CHANCE = 0.03; //0-1
+	private final double ROAD_SPLIT_CHANCE = 0.02; //0-1
 	
 	private final Color MAJOR_ROAD_COLOR = new Color(133/255f, 42/255f, 31/255f, 1);
 	private final int MAJOR_ROAD_WIDTH = 4;
