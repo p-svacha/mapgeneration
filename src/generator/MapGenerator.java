@@ -1,13 +1,16 @@
 package generator;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.paint.Color;
+import map.City;
+import map.Lake;
 import map.Map;
 import map.MapElement;
+import map.River;
+import map.Road;
 import app.MapGeneratorStarter;
 
 public class MapGenerator {
@@ -21,12 +24,15 @@ public class MapGenerator {
 	public IntegerProperty widthProperty = new SimpleIntegerProperty(MapGeneratorStarter.WIDTH/6*5-10);
 	public IntegerProperty heightProperty = new SimpleIntegerProperty(MapGeneratorStarter.HEIGHT-30);
 	
-	private ArrayList<MapElement> cities = new ArrayList<MapElement>();
+	private ArrayList<City> cities = new ArrayList<City>();
+	private ArrayList<Road> roads = new ArrayList<Road>();
+	private ArrayList<Lake> lakes = new ArrayList<Lake>();
+	private ArrayList<River> rivers = new ArrayList<River>();
 	
 	private CityGenerator cityGenerator;
+	private RoadGenerator roadGenerator;
+	private LakesGenerator lakesGenerator;
 	
-	private Random r;
-
   /***************************************************************************
    *                                                                         *
    * Contructor                                                              *
@@ -35,21 +41,8 @@ public class MapGenerator {
 	
 	public MapGenerator() {
 		cityGenerator = new CityGenerator();
-		r = new Random();
-	}
-
-  /***************************************************************************
-   *                                                                         *
-   * Private methods                                                         *
-   *                                                                         *
-   **************************************************************************/
-	
-	public static Color randomColor() {
-		Random r = new Random();
-		double red = r.nextDouble();
-		double green = r.nextDouble();
-		double blue = r.nextDouble();
-		return new Color(red, green, blue, 1);
+		roadGenerator = new RoadGenerator();
+		lakesGenerator = new LakesGenerator();
 	}
 
   /***************************************************************************
@@ -59,17 +52,44 @@ public class MapGenerator {
    **************************************************************************/
 	
 	public Map generate() {
+		int width = widthProperty.getValue();
+		int height = heightProperty.getValue();
 		Map map = new Map();
 		cities.clear();
+		roads.clear();
+		lakes.clear();
 		
-		map.setBackgroundColor(Color.BLACK);
+		map.setBackgroundColor(new Color(234/255f, 242/255f, 229/255f, 1));
 		
-		for(int i = 0; i < 1;i ++)
-		cities.add(cityGenerator.generateCity(400, 300));
+		for(int i = 0; i < 12;i ++) {
+			boolean tooClose = false;
+			int x, y;
+			do{
+				x = (int) (Math.random()*width);
+				y = (int) (Math.random()*height);
+				tooClose = false;
+				for(City c : cities) {
+					if(Generator.getDistanceBetweenTwoPoints(x, y, c.xPos, c.yPos) < 100) {
+						tooClose = true;
+					}
+				}
+				
+			} while(tooClose);
+			
+			cities.add(cityGenerator.generateCity(x, y));
+		}
+		
+		roads.addAll(roadGenerator.generate(width, height, cities));
+		lakes.addAll(lakesGenerator.generateLakes(width, height, cities, roads));
+		
+		
 
 		
 		ArrayList<MapElement> allElements = new ArrayList<MapElement>();
 		allElements.addAll(cities);
+		allElements.addAll(roads);
+		allElements.addAll(lakes);
+		allElements.addAll(rivers);
 		map.setMapElements(allElements);
 		
 		map.setWidth(widthProperty.getValue());

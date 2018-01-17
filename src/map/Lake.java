@@ -3,7 +3,9 @@ package map;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class City extends MapElement{
+public class Lake extends MapElement{
+	
+	
 
   /***************************************************************************
    *                                                                         *
@@ -12,6 +14,8 @@ public class City extends MapElement{
    **************************************************************************/
 	
 	public Color backgroundColor;
+	public Color strokeColor;
+	public int strokeWidth;
 	public int size;
 
   /***************************************************************************
@@ -36,6 +40,9 @@ public class City extends MapElement{
 	public void drawOnCanvas(GraphicsContext context) {
 		context.setFill(backgroundColor);
 		context.fillPolygon(xPointsFromArea(), yPointsFromArea(), area.length);
+		context.setStroke(strokeColor);
+		context.setLineWidth(strokeWidth);
+		context.strokePolygon(xPointsFromArea(), yPointsFromArea(), area.length);
 	}
 
   /***************************************************************************

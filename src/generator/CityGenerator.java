@@ -5,7 +5,6 @@ import geometry.Point;
 import java.util.ArrayList;
 import java.util.Random;
 
-import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import map.City;
 
@@ -18,6 +17,8 @@ public class CityGenerator {
    * Fields                                                                  *
    *                                                                         *
    **************************************************************************/
+	
+	private final Color CITY_COLOR = new Color(253f/255, 252f/255, 232f/255, 1);
 	
 	private int MIN_TRIANGLES = 10;
 	private int MAX_TRIANGLES = 20;
@@ -61,14 +62,14 @@ public class CityGenerator {
 	 * @param yPos
 	 * @return
 	 */
-	private Point[] generateArea4(int xPos, int yPos) {
+	private Point[] generateCityArea(City c, int xPos, int yPos) {
 		ArrayList<Point> area = new ArrayList<Point>();
 		
-		int nPoints = 18;
-		int size = 150;
-		int randomRangeDistance = 11;
-		int randomRangeXY = 5;
-		int trendSpeed = 31;
+		int nPoints = 27;
+		int size = 30;
+		int randomRangeDistance = 3;
+		int randomRangeXY = 3;
+		int trendSpeed = 7;
 		
 		for(int i = 0; i < nPoints; i++) {
 			double angle = (double)i/nPoints*360;
@@ -78,20 +79,17 @@ public class CityGenerator {
 		}
 		
 		int trendDistance = 0;
-		System.out.println("");
 		for(int i = 0; i < nPoints; i++) {
 			Point p = area.get(i);
 			
 			int distanceTrendChange = (int) ((r.nextGaussian()*trendSpeed));
-			System.out.println("dddd: "+distanceTrendChange);
+
 			
 			trendDistance += distanceTrendChange;
 			if(trendDistance < -size/3) {
-				System.out.println("ayy to small");
 				trendDistance = -size/3;
 			}
 			if(trendDistance > size/2) {
-				System.out.println("ayy to BIG");
 				trendDistance = size/2;
 			}
 			
@@ -100,7 +98,7 @@ public class CityGenerator {
 			
 			int moveDistance = r.nextInt(randomRangeDistance)-randomRangeDistance/2;
 			
-			System.out.println(trendDistance);
+			if(size+moveDistance+trendDistance > c.size) c.size = size + moveDistance + trendDistance;
 			
 			p.x += (moveDistance+trendDistance) * Math.sin(Math.toRadians(p.angle));
 			p.y += (moveDistance+trendDistance) * Math.cos(Math.toRadians(p.angle));
@@ -561,8 +559,16 @@ public class CityGenerator {
 	
 	public City generateCity(int xPos, int yPos) {
 		City city = new City();
-		Point[] area = generateArea4(xPos, yPos);
-		city.setBackgroundColor(Color.BEIGE);
+		Point[] area = generateCityArea(city, xPos, yPos);
+		int xSum = 0;
+		int ySum = 0;
+		for(Point p : area) {
+			xSum += p.x;
+			ySum += p.y;
+		}
+		city.xPos = xSum/area.length;
+		city.yPos = ySum/area.length;
+		city.backgroundColor = CITY_COLOR;
 		city.setArea(area);
 		
 		return city;

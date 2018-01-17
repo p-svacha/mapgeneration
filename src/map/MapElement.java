@@ -1,7 +1,6 @@
 package map;
 
 import geometry.Point;
-import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -13,10 +12,9 @@ public class MapElement {
    *                                                                         *
    **************************************************************************/
 	
-	protected int xPos;
-	protected int yPos;
+	public int xPos;
+	public int yPos;
 	protected Point[] area;
-	protected Color backgroundColor;
 
   /***************************************************************************
    *                                                                         *
@@ -53,8 +51,7 @@ public class MapElement {
    **************************************************************************/
 	
 	public void drawOnCanvas(GraphicsContext context) {
-		context.setFill(backgroundColor);
-		context.fillPolygon(xPointsFromArea(), yPointsFromArea(), area.length);
+		System.out.println("If you see this message, you forgot to override drawOnCanvas() in a MapElement.");
 	}
 
   /***************************************************************************
@@ -65,10 +62,6 @@ public class MapElement {
 	
 	public void setArea(Point[] area) {
 		this.area = area;
-	}
-	
-	public void setBackgroundColor(Color color) {
-		this.backgroundColor = color;
 	}
 
 }
