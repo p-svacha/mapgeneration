@@ -19,11 +19,14 @@ public class RoadGenerator {
    *                                                                         *
    **************************************************************************/
 
+	private final static String DEBUG_PREFIX = "RoadGenerator: ";
+	
 	private final int ROAD_SEGMENT_SIZE = 10; //after what distance does road angle change
 	private final double ROAD_MAX_CURVE_ANGLE = 10; //how much can road angle change every segmen
 	private final double ROAD_SPLIT_ANGLE_RANGE = 90; //i.e. 90 means it splits from 45° to 135°
 	private final int INITIAL_ADDITIONAL_ROADS = 0; //how many roads are initially added besides city roads
 	private final double ROAD_SPLIT_CHANCE = 0.02; //0-1
+	private final int ROAD_MERGE_DISTANCE = 10; //distance where close roads merge
 	
 	private final Color MAJOR_ROAD_COLOR = new Color(133/255f, 42/255f, 31/255f, 1);
 	private final int MAJOR_ROAD_WIDTH = 4;
@@ -71,19 +74,38 @@ public class RoadGenerator {
 				currentX = (int) r.startPoint.getX();
 				currentY = (int) r.startPoint.getY();
 				for(LineTo line : r.path) {
-//					System.out.println("searching intersection from");
-//					System.out.println(roadStartX + "/" + roadStartY + " to " + roadEndX + "/" + roadEndY);
-//					System.out.println(currentX + "/" + currentY + " to " + (int) (line.getX()) + "/" + (int) (line.getY()));
 					Point p = Generator.getLineSegmentIntersectionPoint(roadStartX, roadStartY, roadEndX, roadEndY, currentX, currentY, (int) (line.getX()), (int) (line.getY()));
 					currentX = (int) line.getX();
 					currentY = (int) line.getY();
 					if(p != null) {
+						System.out.println(DEBUG_PREFIX + "Roads intersecting at " + currentX + "/" + currentY);
 						return p;
 					}
 				}
 			}
 		}
 		return null;
+	}
+	
+	private void checkRoadMerge(Road road) {
+		for(Road r : roads) {
+			if(road != r) {
+				int currentX = (int) r.startPoint.getX();
+				int currentY = (int) r.startPoint.getY();
+				for(LineTo line : r.path) {
+					int distance = Generator.getDistanceBetweenTwoPoints(road.x, road.y, currentX, currentY);
+					if(distance < ROAD_MERGE_DISTANCE) {
+						System.out.println(DEBUG_PREFIX + "Roads merging at " + currentX + "/" + currentY);
+						LineTo lineToMerge = road.path.get(road.path.size()-1);
+						lineToMerge.xProperty().setValue(currentX);
+						lineToMerge.yProperty().setValue(currentY);
+						road.active = false;
+					}
+					currentX = (int) line.getX();
+					currentY = (int) line.getY();
+				}
+			}
+		}
 	}
 	
 	private boolean hasActiveRoads() {
@@ -128,10 +150,13 @@ public class RoadGenerator {
 				r.wentInactiveThisLoop = false;
 				if(r.active) {
 					
+					//check out of bounds
 					if(r.x < 0 || r.x > width || r.y < 0 || r.y > height) {
 						r.active = false;
 						r.wentInactiveThisLoop = true;
 					}
+					
+					//check road intersection
 					else if(r.path.size() > 1 && roadIntersects(r) != null) {
 						Point p = roadIntersects(r);
 						r.path.get(r.path.size()-1).xProperty().setValue(p.x);
@@ -140,25 +165,32 @@ public class RoadGenerator {
 						r.wentInactiveThisLoop = true;
 					}
 					else {
-						if(Math.random() < ROAD_SPLIT_CHANCE && r.path.size() > 2) {
-							int negative = Math.random() > 0.5 ? -1 : 1;
-							toAdd.add(new Road(r.x, r.y, r.currentAngle+negative*(90+Math.random()*ROAD_SPLIT_ANGLE_RANGE-ROAD_SPLIT_ANGLE_RANGE/2), r.depth+1));
+						
+						//check road merge
+						if(r.path.size() > 5 && r.active) checkRoadMerge(r);
+						
+						if(r.active) {
+							//road split
+							if(Math.random() < ROAD_SPLIT_CHANCE && r.path.size() > 2) {
+								int negative = Math.random() > 0.5 ? -1 : 1;
+								toAdd.add(new Road(r.x, r.y, r.currentAngle+negative*(90+Math.random()*ROAD_SPLIT_ANGLE_RANGE-ROAD_SPLIT_ANGLE_RANGE/2), r.depth+1));
+							}
+							
+							double angleDiff = Math.random()*ROAD_MAX_CURVE_ANGLE*2-ROAD_MAX_CURVE_ANGLE;
+							
+							r.currentAngle += angleDiff;
+							
+							double moveX = (int) (ROAD_SEGMENT_SIZE * Math.sin(Math.toRadians(r.currentAngle)));
+							double moveY = (int) (ROAD_SEGMENT_SIZE * Math.cos(Math.toRadians(r.currentAngle)));
+							
+							int newX = r.x += moveX;
+							int newY = r.y += moveY;
+							
+							r.x = newX;
+							r.y = newY;
+							
+							r.path.add(new LineTo(newX, newY));
 						}
-						
-						double angleDiff = Math.random()*ROAD_MAX_CURVE_ANGLE*2-ROAD_MAX_CURVE_ANGLE;
-						
-						r.currentAngle += angleDiff;
-						
-						double moveX = (int) (ROAD_SEGMENT_SIZE * Math.sin(Math.toRadians(r.currentAngle)));
-						double moveY = (int) (ROAD_SEGMENT_SIZE * Math.cos(Math.toRadians(r.currentAngle)));
-						
-						int newX = r.x += moveX;
-						int newY = r.y += moveY;
-						
-						r.x = newX;
-						r.y = newY;
-						
-						r.path.add(new LineTo(newX, newY));
 					}
 				}
 			}

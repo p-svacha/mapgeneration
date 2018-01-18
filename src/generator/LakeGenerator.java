@@ -18,6 +18,7 @@ public class LakeGenerator {
    * Fields                                                                  *
    *                                                                         *
    **************************************************************************/
+	private final static String DEBUG_PREFIX = "LakeGenerator: ";
 	
 	private final int LAKE_AMOUNT = 2;
 	
@@ -138,10 +139,6 @@ public class LakeGenerator {
 		for(City c : cities) {
 			int distance = Generator.getDistanceBetweenTwoPoints(x, y, c.xPos, c.yPos);
 			if(distance < size + c.size) {
-				System.out.println("");
-				System.out.println("A city was the problem");
-				System.out.println("Lake X: " + x + " Y: " + y + " SIZE: " + size);
-				System.out.println("City X: " + c.xPos + " Y: " + c.yPos + " SIZE: " + c.size);
 				return false;
 			}
 		}
@@ -155,10 +152,6 @@ public class LakeGenerator {
 				int distanceP2 = Generator.getDistanceBetweenTwoPoints(x, y, p2.x, p2.y);
 				int distance = distanceP1 <= distanceP2 ? distanceP1 : distanceP2;
 				if(distance < size + r.width) {
-					System.out.println("");
-					System.out.println("A road was the problem");
-					System.out.println("Lake X: " + x + " Y: " + y + " SIZE: " + size);
-					System.out.println("Road : " + currentX + "/" + currentY + " to " + (int) (line.getX()) + "/" + (int) (line.getY()));
 					return false;
 				}
 				currentX = (int) line.getX();
@@ -168,7 +161,6 @@ public class LakeGenerator {
 		for(Lake l : lakes) {
 			int distance = Generator.getDistanceBetweenTwoPoints(x, y, l.xPos, l.yPos);
 			if(distance < size + l.size) {
-				System.out.println("A lake was the problem");
 				return false;
 			}
 		}
@@ -192,7 +184,6 @@ public class LakeGenerator {
 			Point[] area = generateLakeArea(lake);
 			
 			Point position = searchPosition(lake.size, mapWidth, mapHeight, cities, roads);
-			System.out.println("position chosen: " + position.x + "/" + position.y);
 			
 			for(Point p : area) {
 				p.x += position.x;
